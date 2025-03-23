@@ -1,5 +1,5 @@
 'use client';
-import { authClient } from '@/lib/auth-client';
+import { authClient } from '@/lib/auth/client';
 import {
   addToast,
   Button,
@@ -117,7 +117,8 @@ export default function Register() {
         email: formik.values.email,
         type: 'sign-in'
       })
-      .then(() => {
+      .then((res) => {
+        console.log(res);
         formik.setFieldValue('otpSent', true);
         paginate(1);
       })
@@ -131,9 +132,10 @@ export default function Register() {
   };
 
   const verifyOtp = async () => {
-    console.log(formik.values.email, formik.values.otp);
-    await authClient.emailOtp
-      .verifyEmail({
+    console.log(typeof formik.values.email, typeof formik.values.otp);
+
+    await authClient.signIn
+      .emailOtp({
         email: formik.values.email,
         otp: formik.values.otp
       })
@@ -142,10 +144,22 @@ export default function Register() {
         if (res.data) {
           formik.setFieldValue('isOtpVerified', true);
           paginate(1);
-        } else {
-          formik.setFieldError('otp', res.error?.message || 'Invalid OTP');
         }
       });
+    // await authClient.emailOtp
+    //   .verifyEmail({
+    //     email: formik.values.email,
+    //     otp: formik.values.otp
+    //   })
+    //   .then((res) => {
+    //     console.log(res);
+    //     if (res.data) {
+    //       formik.setFieldValue('isOtpVerified', true);
+    //       paginate(1);
+    //     } else {
+    //       formik.setFieldError('otp', res.error?.message || 'Invalid OTP');
+    //     }
+    //   });
   };
 
   return (

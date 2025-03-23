@@ -1,7 +1,7 @@
 'use client';
 import { Button } from '@heroui/react';
 import { handleLogin } from '@/lib/actions/client/auth';
-import { authClient } from '@/lib/auth-client';
+import { authClient } from '@/lib/auth/client';
 import { useRouter } from 'next/navigation';
 
 async function addPasskey() {
@@ -22,7 +22,10 @@ export default function LoginPage() {
     <div>
       <Button
         onPress={() =>
-          handleLogin({ email: 'test@test.com', password: 'password' })
+          handleLogin({
+            email: process.env.NEXT_PUBLIC_TEMP_EMAIL || '',
+            password: process.env.NEXT_PUBLIC_TEMP_PASSWORD || ''
+          })
         }
       >
         Login

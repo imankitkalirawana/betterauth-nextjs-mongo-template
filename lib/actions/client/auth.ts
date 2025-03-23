@@ -1,6 +1,6 @@
 'use client';
 
-import { authClient } from '@/lib/auth-client';
+import { authClient } from '@/lib/auth/client';
 
 export const handleLogin = async ({
   email,
@@ -19,6 +19,7 @@ export const handleLogin = async ({
   onSuccess?: (ctx: any) => void;
   onError?: (ctx: any) => void;
 }) => {
+  console.log('handleLogin', email, password);
   const { data, error } = await authClient.signIn.email(
     {
       email,
@@ -28,12 +29,15 @@ export const handleLogin = async ({
     },
     {
       onRequest: (ctx) => {
+        console.log('onRequest', ctx);
         onRequest?.(ctx);
       },
       onSuccess: (ctx) => {
+        console.log('onSuccess', ctx);
         onSuccess?.(ctx);
       },
       onError: (ctx) => {
+        console.log('onError', ctx);
         onError?.(ctx);
       }
     }

@@ -6,12 +6,19 @@ import { passkey } from 'better-auth/plugins/passkey';
 import { admin } from 'better-auth/plugins';
 import { organization } from 'better-auth/plugins';
 import { emailOTP } from 'better-auth/plugins';
-import { sendHTMLEmail } from './email';
+import { sendHTMLEmail } from '../email';
+import { nextCookies } from 'better-auth/next-js';
 
 const client = new MongoClient(process.env.MONGO_URI as string);
 const db = client.db();
 
 export const auth = betterAuth({
+  // session: {
+  //   cookieCache: {
+  //     enabled: true,
+  //     maxAge: 5 * 60 // Cache duration in seconds
+  //   }
+  // },
   database: mongodbAdapter(db),
   socialProviders: {
     google: {
@@ -41,6 +48,7 @@ export const auth = betterAuth({
         };
         await sendHTMLEmail(MailOptions);
       }
-    })
+    }),
+    nextCookies()
   ]
 });

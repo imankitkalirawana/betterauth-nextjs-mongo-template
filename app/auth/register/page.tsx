@@ -1,7 +1,7 @@
 'use client';
 import Register from '@/components/auth/Register';
 import { addMemberToOrganization } from '@/lib/actions/server/organization';
-import { authClient } from '@/lib/auth-client';
+import { authClient } from '@/lib/auth/client';
 import { Button } from '@heroui/react';
 import { toast } from 'sonner';
 
@@ -38,5 +38,10 @@ export default function RegisterPage() {
 
     console.log(data, error);
   };
-  return <Register />;
+
+  return (
+    <div>
+      <Button onPress={handleRegister}>Register</Button>
+    </div>
+  );
 }
