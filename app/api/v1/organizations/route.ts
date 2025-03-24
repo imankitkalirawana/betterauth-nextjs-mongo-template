@@ -6,7 +6,7 @@ import { auth } from '@/lib/auth';
 
 export const GET = async function GET(request: any) {
   const session = await auth.api.getSession({
-    headers: headers()
+    headers: await headers()
   });
 
   const allowedUsers = ['admin', 'superadmin', 'user'];

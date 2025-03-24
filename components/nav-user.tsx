@@ -1,15 +1,6 @@
 'use client';
 
-import {
-  BadgeCheck,
-  Bell,
-  ChevronsUpDown,
-  CreditCard,
-  LogOut,
-  Sparkles
-} from 'lucide-react';
-
-import { AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { ChevronsUpDown } from 'lucide-react';
 
 import {
   SidebarMenu,
@@ -26,6 +17,8 @@ import {
   DropdownTrigger
 } from '@heroui/react';
 import { Icon } from '@iconify/react/dist/iconify.js';
+import { authClient } from '@/lib/auth/client';
+import { useRouter } from 'nextjs-toploader/app';
 
 export function NavUser({
   user
@@ -36,7 +29,7 @@ export function NavUser({
     avatar: string;
   };
 }) {
-  const { isMobile } = useSidebar();
+  const router = useRouter();
 
   return (
     <SidebarMenu>
@@ -124,6 +117,15 @@ export function NavUser({
             <DropdownSection>
               <DropdownItem
                 key="logout"
+                onPress={async () => {
+                  await authClient.signOut({
+                    fetchOptions: {
+                      onSuccess: () => {
+                        router.push('/auth/login'); // redirect to login page
+                      }
+                    }
+                  });
+                }}
                 startContent={<Icon icon="solar:logout-linear" width={20} />}
               >
                 Log out
