@@ -3,6 +3,8 @@ import Organization from '@/models/Organization';
 import { connectDB } from '@/lib/db';
 import { headers } from 'next/headers';
 import { auth } from '@/lib/auth';
+import { Organization as OrganizationType } from 'better-auth/plugins';
+import { Types } from 'mongoose';
 
 export const GET = async function GET(request: any) {
   const session = await auth.api.getSession({
@@ -41,13 +43,22 @@ export const GET = async function GET(request: any) {
   };
 
   try {
-    let organizations = [];
+    let organizations: OrganizationType[] = [];
     if (session?.user?.role === 'admin') {
-      organizations = await Organization.find(searchQuery)
+      const res = await Organization.find(searchQuery)
         .sort(sortObject)
         .skip((page - 1) * limit)
         .limit(limit)
         .lean();
+
+      organizations = res.map((item) => ({
+        id: (item._id as unknown as Types.ObjectId).toString(),
+        name: item.name as string,
+        slug: item.slug as string,
+        createdAt: item.createdAt as Date,
+        metadata: item.metadata,
+        logo: item.logo as string | null | undefined
+      }));
     } else {
       organizations = await auth.api.listOrganizations({
         headers: headers()

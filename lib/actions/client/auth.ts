@@ -19,7 +19,6 @@ export const handleLogin = async ({
   onSuccess?: (ctx: any) => void;
   onError?: (ctx: any) => void;
 }) => {
-  console.log('handleLogin', email, password);
   const { data, error } = await authClient.signIn.email(
     {
       email,

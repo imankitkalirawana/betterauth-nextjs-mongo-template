@@ -59,7 +59,7 @@ export default function Register() {
         setIsOtpSent(true);
       })
       .catch((error) => {
-        console.log(error);
+        console.error(error);
         formik.setFieldError('otp', error.message);
       })
       .finally(() => {

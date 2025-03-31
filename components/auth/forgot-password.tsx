@@ -34,7 +34,7 @@ export default function ForgotPassword() {
             setIsVerified(true);
           })
           .catch((error) => {
-            console.log(error);
+            console.error(error);
           });
       } else {
         await sendOTP({ email: values.email, type: 'forget-password' })
@@ -42,7 +42,7 @@ export default function ForgotPassword() {
             setIsOtpSent(true);
           })
           .catch((error) => {
-            console.log(error);
+            console.error(error);
           });
       }
     }
@@ -59,7 +59,7 @@ export default function ForgotPassword() {
         setIsOtpSent(true);
       })
       .catch((error) => {
-        console.log(error);
+        console.error(error);
         formik.setFieldError('otp', error.message);
       })
       .finally(() => {

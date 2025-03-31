@@ -31,6 +31,7 @@ import { saveTableConfig, loadTableConfig } from '@/utils/local-storage';
 import axios from 'axios';
 import { useDebounce } from 'react-haiku';
 import { rowOptions } from '@/lib/config';
+import { useRouter } from 'nextjs-toploader/app';
 
 const tableKey = 'organizations';
 
@@ -65,7 +66,6 @@ const getAllOrganizations = async (params: {
   const res = await axios.get(`/api/v1/organizations`, {
     params
   });
-  console.log(res.data);
   return res.data;
 };
 
@@ -95,6 +95,7 @@ const handleExport = async () => {
 };
 
 export default function Organizations() {
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = React.useState('');
   const query = useDebounce(searchQuery, 500);
 
@@ -384,7 +385,7 @@ export default function Organizations() {
         onSelectionChange={setSelectedKeys}
         onSortChange={setSortDescriptor}
         onRowAction={(key) => {
-          console.log(key);
+          router.push(`/dashboard/organizations/${key}`);
         }}
         className="cursor-pointer"
       >

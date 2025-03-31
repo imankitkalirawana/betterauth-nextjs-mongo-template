@@ -26,17 +26,11 @@ export default function Login() {
       password: Yup.string().required('Password is required')
     }),
     onSubmit: async (values) => {
-      console.log(values);
       await login({
         email: values.email,
         password: values.password
       })
         .then((res) => {
-          console.log(res);
-          addToast({
-            title: 'Login successful',
-            color: 'success'
-          });
           router.push('/dashboard');
         })
         .catch((err) => {

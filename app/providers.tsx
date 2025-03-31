@@ -17,14 +17,23 @@ declare module '@react-types/shared' {
 }
 
 export function Providers({ children }: { children: React.ReactNode }) {
-  const queryClient = new QueryClient();
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        staleTime: 60 * 1000
+      }
+    }
+  });
   const router = useRouter();
 
   return (
     <HeroUIProvider navigate={router.push}>
       <ToastProvider
         toastProps={{
-          shouldShowTimeoutProgress: true
+          variant: 'flat',
+          timeout: 3000,
+          shouldShowTimeoutProgress: true,
+          radius: 'lg'
         }}
       />
       <QueryClientProvider client={queryClient}>

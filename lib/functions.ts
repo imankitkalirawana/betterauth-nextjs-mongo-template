@@ -28,7 +28,6 @@ export const sendMail = async (
 };
 
 export const sendSMS = async (phone: string, message: string) => {
-  console.log(`Your otp for ${phone} is ${message}`);
   return `Your otp for ${phone} is ${message}`;
 };
 
