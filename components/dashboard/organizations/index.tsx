@@ -7,8 +7,6 @@ import {
   TableRow,
   TableCell,
   Table,
-  ChipProps,
-  Chip,
   Selection,
   Dropdown,
   DropdownTrigger,
@@ -18,9 +16,9 @@ import {
   SortDescriptor,
   Input,
   Pagination,
-  Tooltip,
   Spinner,
-  Avatar
+  Avatar,
+  addToast
 } from '@heroui/react';
 import Link from 'next/link';
 import React, { useEffect } from 'react';
@@ -31,7 +29,6 @@ import FormatTimeInTable from '@/components/ui/format-time-in-table';
 import Skeleton from '@/components/ui/skeleton';
 import { saveTableConfig, loadTableConfig } from '@/utils/local-storage';
 import axios from 'axios';
-import { toast } from 'sonner';
 import { useDebounce } from 'react-haiku';
 import { rowOptions } from '@/lib/config';
 
@@ -89,7 +86,11 @@ const handleExport = async () => {
     setTimeout(() => window.URL.revokeObjectURL(url), 100);
   } catch (error) {
     console.error('Error downloading the file:', error);
-    toast.error('Error downloading the file');
+    addToast({
+      title: 'Error',
+      description: 'Error downloading the file',
+      color: 'danger'
+    });
   }
 };
 
@@ -252,7 +253,7 @@ export default function Organizations() {
 
   const topContent = React.useMemo(() => {
     return (
-      <div className="mt-12 flex flex-col gap-4">
+      <div className="flex flex-col gap-4">
         <div className="flex items-end justify-between gap-3">
           <Input
             isClearable
