@@ -1,5 +1,8 @@
 'use client';
-import { sectionItemsWithTeams } from '@/components/dashboard/sidebar/sidebar-items';
+import {
+  sectionItemFooter,
+  sectionItems
+} from '@/components/dashboard/sidebar/sidebar-items';
 import {
   cn,
   Spacer,
@@ -43,9 +46,9 @@ export default function DashboardLayout({
     return (
       <div
         className={cn(
-          'relative flex h-full w-72 max-w-[288px] flex-1 flex-col !border-r-small border-divider transition-[transform,opacity,margin] duration-250 ease-in-out',
+          'relative flex h-full w-16 max-w-16 flex-1 flex-col !border-r-small border-divider transition-all duration-250 ease-in-out',
           {
-            '-ml-72 -translate-x-72': isHidden
+            'w-72 max-w-[288px]': !isHidden
           }
         )}
       >
@@ -59,48 +62,18 @@ export default function DashboardLayout({
         <ScrollShadow className="h-full max-h-full pl-2">
           <Sidebar
             defaultSelectedKey="home"
-            items={sectionItemsWithTeams}
+            items={sectionItems}
             selectedKeys={[currentPath || 'dashboard']}
+            isCompact={isHidden}
           />
         </ScrollShadow>
         <Spacer y={8} />
         <div className="flex flex-col px-2 pb-4">
-          <Button
-            aria-label="Help & Information"
-            fullWidth
-            className="justify-start text-default-500 data-[hover=true]:text-foreground"
-            startContent={
-              <Icon
-                className="text-default-500"
-                icon="solar:question-circle-bold-duotone"
-                width={24}
-              />
-            }
-            variant="light"
-            as={Link}
-            href="/dashboard"
-          >
-            Help & Information
-          </Button>
-          <Button
-            aria-label="Log Out"
-            className="justify-start text-default-500 data-[hover=true]:text-danger"
-            startContent={
-              <Icon
-                className="rotate-180"
-                icon="solar:logout-bold-duotone"
-                width={24}
-              />
-            }
-            variant="light"
-            color="danger"
-            onPress={async () => {
-              //   await signOut();
-              //   router.push('/auth/login');
-            }}
-          >
-            Log Out
-          </Button>
+          <Sidebar
+            items={sectionItemFooter}
+            defaultSelectedKey="home"
+            isCompact={isHidden}
+          />
         </div>
       </div>
     );

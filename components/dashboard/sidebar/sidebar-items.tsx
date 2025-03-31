@@ -21,4 +21,17 @@ export const sectionItems: SidebarItem[] = [
   }
 ];
 
-export const sectionItemsWithTeams: SidebarItem[] = [...sectionItems];
+export const sectionItemFooter: SidebarItem[] = [
+  {
+    key: 'help',
+    href: '/dashboard/help',
+    icon: 'solar:question-circle-bold-duotone',
+    title: 'Help & Information'
+  },
+  {
+    key: 'logout',
+    href: '/dashboard/logout',
+    icon: 'solar:logout-bold-duotone',
+    title: 'Log Out'
+  }
+];

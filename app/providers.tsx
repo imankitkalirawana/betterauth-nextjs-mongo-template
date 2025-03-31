@@ -6,12 +6,22 @@ import React from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import NextTopLoader from 'nextjs-toploader';
+import { useRouter } from 'nextjs-toploader/app';
+
+declare module '@react-types/shared' {
+  interface RouterConfig {
+    routerOptions: NonNullable<
+      Parameters<ReturnType<typeof useRouter>['push']>[1]
+    >;
+  }
+}
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const queryClient = new QueryClient();
+  const router = useRouter();
 
   return (
-    <HeroUIProvider>
+    <HeroUIProvider navigate={router.push}>
       <ToastProvider
         toastProps={{
           shouldShowTimeoutProgress: true
