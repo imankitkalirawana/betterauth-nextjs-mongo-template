@@ -3,10 +3,6 @@ import { authClient } from '@/lib/auth/client';
 import {
   addToast,
   Button,
-  Card,
-  CardBody,
-  CardFooter,
-  CardHeader,
   Input,
   InputOtp,
   Link,
