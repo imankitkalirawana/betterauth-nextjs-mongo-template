@@ -1,13 +1,6 @@
 import mongoose from 'mongoose';
 import { Base } from '@/lib/interface';
-
-export interface OrganizationType extends Base {
-  _id: string;
-  name: string;
-  slug: string;
-  logo: string;
-  metadata: string;
-}
+import { Organization as OrganizationType } from 'better-auth/plugins';
 
 const organizationSchema = new mongoose.Schema<OrganizationType>(
   {

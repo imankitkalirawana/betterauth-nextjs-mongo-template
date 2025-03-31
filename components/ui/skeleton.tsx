@@ -1,15 +1,9 @@
-import { cn } from "@/lib/utils"
+import { Skeleton as NextSkeleton, cn } from '@heroui/react';
 
-function Skeleton({
-  className,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement>) {
+export default function Skeleton({ className }: { className?: string }) {
   return (
-    <div
-      className={cn("animate-pulse rounded-md bg-muted", className)}
-      {...props}
+    <NextSkeleton
+      className={cn('rounded-md before:!duration-1000', className)}
     />
-  )
+  );
 }
-
-export { Skeleton }

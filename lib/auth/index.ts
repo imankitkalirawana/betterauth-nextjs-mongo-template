@@ -8,17 +8,13 @@ import { organization } from 'better-auth/plugins';
 import { emailOTP } from 'better-auth/plugins';
 import { sendHTMLEmail } from '../email';
 import { nextCookies } from 'better-auth/next-js';
+import { OtpEmail } from '@/templates/email/auth';
+import { APP_INFO } from '../config';
 
 const client = new MongoClient(process.env.MONGO_URI as string);
 const db = client.db();
 
 export const auth = betterAuth({
-  // session: {
-  //   cookieCache: {
-  //     enabled: true,
-  //     maxAge: 5 * 60 // Cache duration in seconds
-  //   }
-  // },
   database: mongodbAdapter(db),
   socialProviders: {
     google: {
@@ -43,8 +39,8 @@ export const auth = betterAuth({
       async sendVerificationOTP({ email, otp, type }) {
         const MailOptions: MailOptions = {
           to: email,
-          subject: 'Verification OTP',
-          html: `<h1>Your OTP is ${otp}</h1>`
+          subject: `${otp} - ${APP_INFO.name} ${type === 'email-verification' ? 'Verification' : 'Reset Password'}`,
+          html: OtpEmail(otp)
         };
         await sendHTMLEmail(MailOptions);
       }

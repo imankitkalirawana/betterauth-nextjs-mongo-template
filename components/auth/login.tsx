@@ -1,61 +1,73 @@
 'use client';
 import { Icon } from '@iconify/react/dist/iconify.js';
-import { Avatar, Button, Divider, Input } from '@heroui/react';
+import { addToast, Button, Input } from '@heroui/react';
 import Link from 'next/link';
 import React, { useState } from 'react';
 import { useFormik } from 'formik';
-import { toast } from 'sonner';
 import * as Yup from 'yup';
-import { useSearchParams } from 'next/navigation';
+import Logo from '../ui/logo';
+import { useQueryState } from 'nuqs';
+import { useRouter } from 'nextjs-toploader/app';
+import { login } from '@/lib/actions/server/auth';
 
-const SignIn = () => {
+export default function Login() {
   const [isVisible, setIsVisible] = useState(false);
   const toggleVisibility = () => setIsVisible(!isVisible);
-  const searchParams = useSearchParams();
-
-  const search = searchParams.get('code');
+  const [email, setEmail] = useQueryState('email');
+  const router = useRouter();
 
   const formik = useFormik({
     initialValues: {
-      id: '',
+      email: email ?? '',
       password: ''
     },
     validationSchema: Yup.object({
-      id: Yup.string().required('Email / Phone number is required'),
+      email: Yup.string().required('Email is required'),
       password: Yup.string().required('Password is required')
     }),
     onSubmit: async (values) => {
-      try {
-        console.log(values);
-        toast.success('Login successful');
-      } catch (e) {
-        console.error(e);
-      }
+      console.log(values);
+      await login({
+        email: values.email,
+        password: values.password
+      })
+        .then((res) => {
+          console.log(res);
+          addToast({
+            title: 'Login successful',
+            color: 'success'
+          });
+          router.push('/dashboard');
+        })
+        .catch((err) => {
+          console.error(err);
+          formik.setFieldError('password', err.message);
+        });
     }
   });
   return (
     <div className="mt-12 flex h-full w-full flex-col items-center justify-center">
-      <div className="mt-2 flex w-full max-w-sm flex-col gap-4 rounded-large bg-content1 px-8 py-6 shadow-small">
+      <div className="mt-2 flex w-full max-w-sm flex-col gap-4 rounded-3xl bg-content1 px-8 py-6 shadow-small">
         <div className="flex flex-col items-center pb-6">
-          <Avatar src="/logo.svg" className="p-2" size="lg" />
-          <p className="text-xl font-medium">Welcome Back</p>
+          <Logo />
           <p className="text-small text-default-500">
             Log in to your account to continue
           </p>
         </div>
         <form className="flex flex-col gap-3" onSubmit={formik.handleSubmit}>
           <Input
-            label="Email / Phone Number"
-            name="id"
-            variant="bordered"
-            onChange={formik.handleChange}
-            value={formik.values.id}
+            label="Email"
+            radius="lg"
+            name="email"
+            onChange={(e) => {
+              formik.handleChange(e);
+              setEmail(e.target.value);
+            }}
+            value={formik.values.email}
             isInvalid={
-              (formik.touched.id && formik.errors.id ? true : false) || search
-                ? true
-                : false
+              formik.touched.email && formik.errors.email ? true : false
             }
-            errorMessage={formik.errors.id}
+            errorMessage={formik.errors.email}
           />
           <Input
             endContent={
@@ -75,23 +87,19 @@ const SignIn = () => {
             }
             label="Password"
             name="password"
+            radius="lg"
             type={isVisible ? 'text' : 'password'}
-            variant="bordered"
             onChange={formik.handleChange}
             value={formik.values.password}
             isInvalid={
-              (formik.touched.password && formik.errors.password
-                ? true
-                : false) || search
-                ? true
-                : false
+              formik.touched.password && formik.errors.password ? true : false
             }
-            errorMessage={formik.errors.password || search}
+            errorMessage={formik.errors.password}
           />
           <div className="flex items-center justify-between px-1 py-2">
             <Link
               className="text-small text-default-500 hover:underline"
-              href="/auth/forgot-password"
+              href={`/auth/forgot-password?email=${formik.values.email}`}
             >
               Forgot password?
             </Link>
@@ -101,6 +109,8 @@ const SignIn = () => {
             type="submit"
             isLoading={formik.isSubmitting}
             isDisabled={!formik.isValid}
+            variant="shadow"
+            radius="lg"
           >
             Log In
           </Button>
@@ -108,13 +118,14 @@ const SignIn = () => {
 
         <p className="text-center text-small">
           Need to create an account?&nbsp;
-          <Link href="/auth/register" className="hover:underline">
+          <Link
+            href={`/auth/register?email=${formik.values.email}`}
+            className="text-primary hover:underline"
+          >
             Sign Up
           </Link>
         </p>
       </div>
     </div>
   );
-};
-
-export default SignIn;
+}

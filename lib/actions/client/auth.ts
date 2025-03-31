@@ -44,3 +44,19 @@ export const handleLogin = async ({
   );
   return { data, error };
 };
+
+export const handleRegister = async ({
+  email,
+  password,
+  name
+}: {
+  email: string;
+  password: string;
+  name: string;
+}) => {
+  const { data, error } = await authClient.signUp.email({
+    email,
+    password,
+    name
+  });
+};

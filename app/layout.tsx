@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
-import Sonner from '@/components/providers';
 import { Providers } from './providers';
 
 export const metadata: Metadata = {
@@ -20,7 +19,6 @@ export default async function RootLayout({
         <Providers>
           <ThemeProvider attribute="class" defaultTheme="light">
             {children}
-            <Sonner />
           </ThemeProvider>
         </Providers>
       </body>

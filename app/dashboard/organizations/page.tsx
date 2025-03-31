@@ -1,24 +1,28 @@
 import Organizations from '@/components/dashboard/organizations';
-import { OrganizationType } from '@/models/Organization';
-import { headers } from 'next/headers';
+import { auth } from '@/lib/auth';
+import {
+  dehydrate,
+  HydrationBoundary,
+  QueryClient
+} from '@tanstack/react-query';
+import { Organization as OrganizationType } from 'better-auth/plugins';
 
 async function getOrganizations() {
-  try {
-    const res = await fetch(
-      `${process.env.BETTER_AUTH_URL}api/v1/organizations`,
-      {
-        headers: await headers()
-      }
-    );
-    return (await res.json()).organizations;
-  } catch (error: any) {
-    console.error(error);
-    return [] as OrganizationType[];
-  }
+  const res = await fetch('/api/v1/organizations');
+  return await res.json();
 }
 
 export default async function OrganizationsPage() {
-  const organizations: OrganizationType[] = await getOrganizations();
+  const queryClient = new QueryClient();
 
-  return <Organizations organizations={organizations} />;
+  await queryClient.prefetchQuery({
+    queryKey: ['organizations'],
+    queryFn: getOrganizations
+  });
+
+  return (
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <Organizations />
+    </HydrationBoundary>
+  );
 }
