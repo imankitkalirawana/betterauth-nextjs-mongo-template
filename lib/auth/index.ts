@@ -42,7 +42,8 @@ export const auth = betterAuth({
           subject: `${otp} - ${APP_INFO.name} ${type === 'email-verification' ? 'Verification' : 'Reset Password'}`,
           html: OtpEmail(otp)
         };
-        await sendHTMLEmail(MailOptions);
+        const emailTasks = [sendHTMLEmail(MailOptions)];
+        Promise.all(emailTasks);
       }
     }),
     nextCookies()

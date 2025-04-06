@@ -1,20 +1,8 @@
 'use server';
 
-import User from '@/models/User';
-import { connectDB } from '@/lib/db';
-import bcrypt from 'bcryptjs';
-import { handleRegister } from '../client/auth';
 import { auth } from '@/lib/auth';
-import random from 'random-name';
-import { redirect } from 'next/navigation';
-
-const passwordGenerator = async () => {
-  const password =
-    Math.random().toString(36).substring(2, 15) +
-    Math.random().toString(36).substring(2, 15);
-  const hashedPassword = await bcrypt.hash(password, 12);
-  return { password, hashedPassword };
-};
+import { connectDB } from '@/lib/db';
+import User from '@/models/User';
 
 export const sendOTP = async ({
   email,
@@ -22,21 +10,42 @@ export const sendOTP = async ({
 }: {
   email: string;
   type?: 'email-verification' | 'sign-in' | 'forget-password';
-}) => {
-  await auth.api
-    .sendVerificationOTP({
+}): Promise<{ success: boolean; message: string }> => {
+  try {
+    await connectDB();
+    if (type === 'email-verification') {
+      const user = await User.findOne({ email });
+      if (user) {
+        return {
+          success: false,
+          message: 'User already exists'
+        };
+      }
+    } else if (type === 'sign-in' || type === 'forget-password') {
+      const user = await User.findOne({ email });
+      if (!user) {
+        return {
+          success: false,
+          message: 'User does not exist'
+        };
+      }
+    }
+    await auth.api.sendVerificationOTP({
       body: {
         email,
         type
       }
-    })
-    .then((res) => {
-      return res;
-    })
-    .catch((err) => {
-      console.error(err);
-      throw new Error(err.body?.message);
     });
+    return {
+      success: true,
+      message: 'OTP sent successfully'
+    };
+  } catch (err: any) {
+    return {
+      success: false,
+      message: err.body?.message || 'An error occurred while sending the OTP'
+    };
+  }
 };
 
 export const verifyOTP = async ({
@@ -47,31 +56,32 @@ export const verifyOTP = async ({
   email: string;
   otp: string;
   type?: 'email-verification' | 'forget-password';
-}) => {
-  await auth.api
-    .getVerificationOTP({
+}): Promise<{ success: boolean; message: string }> => {
+  try {
+    const res = await auth.api.getVerificationOTP({
       query: {
         email,
         type
       }
-    })
-    .then(async (res) => {
-      if (res.otp === otp) {
-        if (type === 'email-verification') {
-          return res;
-        } else if (type === 'forget-password') {
-          return res;
-        }
-      } else {
-        throw new Error('Invalid OTP');
-      }
-    })
-    .catch((err) => {
-      console.error(err);
-      throw new Error(err.body?.message);
     });
+    if (res.otp === otp) {
+      return {
+        success: true,
+        message: 'OTP verified successfully'
+      };
+    } else {
+      return {
+        success: false,
+        message: 'Invalid OTP'
+      };
+    }
+  } catch (err) {
+    return {
+      success: false,
+      message: 'Invalid OTP'
+    };
+  }
 };
-
 export const forgetPassword = async ({
   email,
   password,
@@ -80,22 +90,26 @@ export const forgetPassword = async ({
   email: string;
   password: string;
   otp: string;
-}) => {
-  await auth.api
-    .resetPasswordEmailOTP({
+}): Promise<{ success: boolean; message: string }> => {
+  try {
+    await auth.api.resetPasswordEmailOTP({
       body: {
         email,
         password,
         otp
       }
-    })
-    .then((res) => {
-      return res;
-    })
-    .catch((err) => {
-      console.error(err);
-      throw new Error(err.body.message);
     });
+
+    return {
+      success: true,
+      message: 'Password reset successfully'
+    };
+  } catch (err: any) {
+    return {
+      success: false,
+      message: err.body?.message || 'Error while resetting password'
+    };
+  }
 };
 
 export const register = async ({
@@ -106,38 +120,39 @@ export const register = async ({
   email: string;
   password: string;
   name: string;
-}) => {
-  await auth.api
-    .createUser({
+}): Promise<{ success: boolean; message: string }> => {
+  try {
+    console.log(email, password, name);
+    // Step 1: Create user
+    await auth.api.createUser({
       body: {
-        name: random.first() + ' ' + random.last(),
+        name,
         email,
         password
       }
-    })
-    .then(async () => {
-      await auth.api
-        .signInEmail({
-          body: {
-            email,
-            password,
-            rememberMe: true
-          }
-        })
-        .then(async (res) => {
-          await auth.api.verifyEmail({
-            query: {
-              token: res.token
-            }
-          });
-        })
-        .catch((err) => {
-          throw new Error(err.body?.message);
-        });
-    })
-    .catch((err) => {
-      throw new Error(err.body?.message);
     });
+
+    // Step 2: Sign in
+    await auth.api.signInEmail({
+      body: {
+        email,
+        password,
+        rememberMe: true,
+        callbackUrl: '/dashboard'
+      }
+    });
+
+    return {
+      success: true,
+      message: 'Registration completed successfully'
+    };
+  } catch (err: any) {
+    console.error('err', err);
+    return {
+      success: false,
+      message: err.message || 'An error occurred while registering'
+    };
+  }
 };
 
 export const login = async ({
